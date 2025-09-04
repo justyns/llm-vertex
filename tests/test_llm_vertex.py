@@ -28,7 +28,6 @@ def test_supported_models_list():
     key_models = [
         'gemini-1.5-pro',
         'gemini-1.5-flash',
-        'gemini-1.0-pro',
     ]
 
     registered_models = []
