@@ -6,6 +6,9 @@ import os
 sys.modules['vertexai'] = MagicMock()
 sys.modules['vertexai.generative_models'] = MagicMock()
 sys.modules['google.cloud.aiplatform_v1beta1.types'] = MagicMock()
+sys.modules['google.cloud'] = MagicMock()
+sys.modules['google.cloud.aiplatform'] = MagicMock()
+sys.modules['google.cloud.aiplatform_v1beta1'] = MagicMock()
 
 @patch.dict(os.environ, {'VERTEX_PROJECT_ID': 'test-project', 'VERTEX_LOCATION': 'us-east1'})
 def test_plugin_is_installed():
@@ -93,3 +96,122 @@ def test_model_name_extraction():
         with patch.dict(os.environ, {'VERTEX_PROJECT_ID': 'test-project', 'VERTEX_LOCATION': 'us-east1'}):
             model = llm_vertex.Vertex(model_id)
             assert model.model_name == expected_name, f"Expected {expected_name}, got {model.model_name}"
+
+
+@patch.dict(os.environ, {}, clear=True)
+def test_get_available_models_without_project_id():
+    """Test that get_available_models returns fallback models when no project ID is set."""
+    import llm_vertex
+
+    # Reset the cache
+    llm_vertex._cached_models = None
+
+    models = llm_vertex.get_available_models()
+
+    # Should return fallback models
+    assert models == llm_vertex.FALLBACK_MODELS
+
+
+@patch.dict(os.environ, {'VERTEX_DISABLE_DYNAMIC_MODELS': 'true', 'VERTEX_PROJECT_ID': 'test-project'})
+def test_get_available_models_with_dynamic_disabled():
+    """Test that get_available_models respects the disable flag."""
+    import llm_vertex
+
+    # Reset the cache
+    llm_vertex._cached_models = None
+
+    models = llm_vertex.get_available_models()
+
+    # Should return fallback models even with project ID set
+    assert models == llm_vertex.FALLBACK_MODELS
+
+
+def test_get_available_models_caching():
+    """Test that get_available_models caches results."""
+    import llm_vertex
+    from unittest.mock import patch as mock_patch
+    import tempfile
+
+    # Reset the cache
+    llm_vertex._cached_models = None
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Override cache file path to use temp directory
+        temp_cache_file = os.path.join(tmpdir, 'test_models.json')
+
+        with mock_patch('llm_vertex.get_cache_file_path', return_value=temp_cache_file):
+            with patch.dict(os.environ, {}, clear=True):
+                models1 = llm_vertex.get_available_models()
+                models2 = llm_vertex.get_available_models()
+
+                # Should return the same cached list
+                assert models1 is models2
+
+
+@patch.dict(os.environ, {}, clear=True)
+def test_file_cache_persistence():
+    """Test that models are saved to and loaded from file cache."""
+    import llm_vertex
+    from unittest.mock import patch as mock_patch
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Override cache file path to use temp directory
+        from pathlib import Path
+        temp_cache_file = Path(tmpdir) / 'test_models.json'
+
+        with mock_patch('llm_vertex.get_cache_file_path', return_value=temp_cache_file):
+            # Reset the in-memory cache
+            llm_vertex._cached_models = None
+
+            # First call should create cache file
+            models1 = llm_vertex.get_available_models()
+            assert temp_cache_file.exists()
+
+            # Reset in-memory cache
+            llm_vertex._cached_models = None
+
+            # Second call should load from file
+            models2 = llm_vertex.get_available_models()
+            assert models1 == models2
+
+
+@patch.dict(os.environ, {'VERTEX_CACHE_TTL': '1'}, clear=False)
+def test_cache_expiry():
+    """Test that cache expires after TTL."""
+    import llm_vertex
+    from unittest.mock import patch as mock_patch
+    import tempfile
+    import time
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        from pathlib import Path
+        temp_cache_file = Path(tmpdir) / 'test_models.json'
+
+        with mock_patch('llm_vertex.get_cache_file_path', return_value=temp_cache_file):
+            # Reset the in-memory cache
+            llm_vertex._cached_models = None
+
+            # First call creates cache
+            models1 = llm_vertex.get_available_models()
+
+            # Wait for cache to expire (TTL is 1 second)
+            time.sleep(2)
+
+            # Reset in-memory cache
+            llm_vertex._cached_models = None
+
+            # Load from file should return None due to expiry
+            cached_models = llm_vertex.load_models_from_cache()
+            assert cached_models is None
+
+
+def test_cache_file_path():
+    """Test that cache file path is correctly constructed."""
+    import llm_vertex
+    from pathlib import Path
+
+    cache_path = llm_vertex.get_cache_file_path()
+    assert cache_path.name == 'models.json'
+    assert 'llm-vertex' in str(cache_path)
+    assert cache_path.parent.exists()  # Directory should be created
