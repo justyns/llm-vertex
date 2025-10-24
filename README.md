@@ -6,14 +6,16 @@ Please note that this plugin is for Vertex AI specifically, not Google AI Studio
 
 For Gemini support using AI Studio, please see [llm-gemini](https://github.com/simonw/llm-gemini) instead.
 
-Supported models:
+## Models
 
-- gemini-2.5-flash
-- gemini-2.5-pro
-- gemini-2.0-flash-lite
-- gemini-2.0-flash
-- gemini-1.5-pro
-- gemini-1.5-flash
+This plugin dynamically discovers available Gemini models from Vertex AI's Model Garden API. Models are cached in `~/.cache/llm-vertex/models.json` for 24 hours to minimize API calls. If the API is unavailable or credentials aren't configured, it falls back to: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash-lite, gemini-2.0-flash, gemini-1.5-pro, gemini-1.5-flash.
+
+**Environment variables:**
+
+``` shell
+export VERTEX_DISABLE_DYNAMIC_MODELS=true  # Disable dynamic fetching
+export VERTEX_CACHE_TTL=3600                # Cache TTL in seconds (default: 86400)
+```
 
 ## Installation
 
