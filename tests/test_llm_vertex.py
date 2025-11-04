@@ -3,9 +3,9 @@ from unittest.mock import patch, MagicMock
 import sys
 import os
 
-sys.modules['vertexai'] = MagicMock()
-sys.modules['vertexai.generative_models'] = MagicMock()
-sys.modules['google.cloud.aiplatform_v1beta1.types'] = MagicMock()
+sys.modules['google'] = MagicMock()
+sys.modules['google.genai'] = MagicMock()
+sys.modules['google.genai.types'] = MagicMock()
 
 @patch.dict(os.environ, {'VERTEX_PROJECT_ID': 'test-project', 'VERTEX_LOCATION': 'us-east1'})
 def test_plugin_is_installed():
