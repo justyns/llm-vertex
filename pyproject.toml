@@ -1,18 +1,13 @@
 [project]
 name = "llm-vertex"
-version = "0.2.2"
+version = "0.3.0"
 description = "Plugin for LLM adding support for Google Cloud Vertex AI"
-dependencies = [
-    "llm",
-    "google-cloud-aiplatform>=1.81.0",
-]
+dependencies = ["llm>=0.27", "google-genai>=1.48.0"]
 readme = "README.md"
-authors = [{name = "Justyn Shull"}]
-license = {text = "Apache-2.0"}
-classifiers = [
-    "License :: OSI Approved :: Apache Software License"
-]
-requires-python = ">3.8"
+authors = [{ name = "Justyn Shull" }]
+license = { text = "Apache-2.0" }
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://github.com/justyns/llm-vertex"
@@ -20,16 +15,10 @@ Changelog = "https://github.com/justyns/llm-vertex/releases"
 Issues = "https://github.com/justyns/llm-vertex/issues"
 
 [project.optional-dependencies]
-dev = [
-    "build>=1.2.2.post1",
-    "twine>=6.1.0",
-    "pytest>=6.0",
-]
+dev = ["build>=1.2.2.post1", "twine>=6.1.0", "pytest>=6.0"]
 
 [project.entry-points.llm]
 vertex = "llm_vertex"
 
 [tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::DeprecationWarning:pydantic.*",
-]
+filterwarnings = ["ignore::DeprecationWarning:pydantic.*"]
