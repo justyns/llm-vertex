@@ -9,16 +9,13 @@ from google.genai import types
 def register_models(register):
     # Source: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     models = [
-        'gemini-2.5-pro',
-        'gemini-2.5-flash',
-        'gemini-2.5-flash-image',
-        'gemini-2.5-flash-lite',
-        'gemini-2.0-flash-001',
-        'gemini-2.0-flash-lite-001',
         'gemini-1.5-flash',
         'gemini-1.5-pro',
-        'gemini-1.0-pro',
-        'gemini-1.0-pro-vision',
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite',
+        'gemini-2.5-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-2.5-pro',
     ]
     
     for model in models:
@@ -27,8 +24,8 @@ def register_models(register):
     # TODO: How to register custom models?
 
 class Vertex(llm.Model):
-    model_id = "vertex-gemini-1.0-pro-vision-001"
-    model_name = "gemini-1.0-pro-vision-001"
+    model_id = ""
+    model_name = ""
     can_stream = True
 
     class Options(llm.Options):
