@@ -26,8 +26,8 @@ def test_supported_models_list():
     # Test for a few key models that should always be present
     # This won't break when new models are added or preview models are removed
     key_models = [
-        'gemini-1.5-pro',
-        'gemini-1.5-flash',
+        'gemini-2.5-pro',
+        'gemini-2.5-flash',
     ]
 
     registered_models = []

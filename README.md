@@ -8,12 +8,14 @@ For Gemini support using AI Studio, please see [llm-gemini](https://github.com/s
 
 Supported models:
 
-- gemini-2.5-flash
+- gemini-3.1-pro-preview
+- gemini-3-pro-preview
+- gemini-3-flash-preview
 - gemini-2.5-pro
-- gemini-2.0-flash-lite
+- gemini-2.5-flash
+- gemini-2.5-flash-lite
 - gemini-2.0-flash
-- gemini-1.5-pro
-- gemini-1.5-flash
+- gemini-2.0-flash-lite
 
 ## Installation
 
@@ -48,7 +50,7 @@ export VERTEX_PROJECT_ID=gcp-project-id VERTEX_LOCATION=us-east1
 Run llm and specify one of the provided models:
 
 ``` shell
-❯ llm -m vertex-gemini-1.5-pro-preview-0409 "What's one clever name for a pet pelican?"
+❯ llm -m vertex-gemini-2.5-flash "What's one clever name for a pet pelican?"
 "Gulliver" would be a clever name for a pet pelican, referencing both its large gullet and its potential for long journeys! 🦜
 ```
 
