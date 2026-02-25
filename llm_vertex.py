@@ -4,6 +4,7 @@ import os
 from typing import Optional
 # from google.cloud.aiplatform_v1beta1.types import Content, Part
 from vertexai.generative_models import GenerativeModel, Part, ChatSession, Content, GenerationConfig
+from vertexai.language_models import TextEmbeddingInput, TextEmbeddingModel
 
 
 @llm.hookimpl
@@ -24,6 +25,26 @@ def register_models(register):
         register(Vertex(f'vertex-{model}'))
 
     # TODO: How to register custom models?
+
+@llm.hookimpl
+def register_embedding_models(register):
+    register(VertexEmbeddingModel("vertex-gemini-embedding-001"), 
+             aliases=("vertex-gemini-embedding-001",))
+
+class VertexEmbeddingModel(llm.EmbeddingModel):
+    def __init__(self, model_id):
+        self.model_id = model_id
+        self._model = None
+        project_id = os.getenv('VERTEX_PROJECT_ID')
+        location = os.getenv('VERTEX_LOCATION')
+        vertexai.init(project=project_id, location=location)
+
+    def embed_batch(self, texts):
+        if self._model is None:
+            self._model = TextEmbeddingModel.from_pretrained(self.model_id.replace('vertex-', ''))
+        embeddings = self._model.get_embeddings([TextEmbeddingInput(text) for text in texts])
+        return [embedding.values for embedding in embeddings]
+
 
 class Vertex(llm.Model):
     model_id = ""
